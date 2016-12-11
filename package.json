@@ -1,0 +1,11 @@
+{
+    "name": "AlkoBot",
+    "description": "",
+    "author": "Hugeli",
+    "version": "1.0.0",
+    "main": "pathToMain",
+    "dependencies": {
+        "needle": "*",
+        "node-telegram-bot-api": "*"
+    }
+}
