@@ -7,14 +7,24 @@ const config = JSON.parse(FS.readFileSync('conf', 'utf8'));
 
 var client = new TelegramClient(config.alkoBot, { polling: true });
 
-client.onText(/\/jalluindeksi/, msg => {
+client.onText(/\/jalluindeksi/, postJalluindeksi);
+client.onText(/\/price/, postPrice);
+
+client.on('message', msg => {
+  if (msg.text.toLowerCase() === 'nykyinen jalluindeksi?')
+    postJalluindeksi(msg);
+  else if(msg.text.toLowerCase().match(/mikä on tuotteen ([^\s]+) hinta\?/g)) 
+    postPrice(msg);
+});
+
+function postJalluindeksi(msg) {
   needle.get('http://droptable.tk:8080/products/000706', (err, res) => {
     client.sendMessage(msg.chat.id, 'Jallun hinta: ' + res.body.data.price + '€');
   });
-});
+}
 
-client.onText(/\/price/, msg => {
-  let arg = msg.text.split(' ')[1];
+function postPrice(msg) {
+  let arg = msg.text.split(' ')[3];
   if (arg) {
     needle.get('http://droptable.tk:8080/products', (err, res) => {
       let products = [];
@@ -37,5 +47,5 @@ client.onText(/\/price/, msg => {
       client.sendMessage(msg.chat.id, resStr, { parse_mode: 'markdown' });
     });
   }
-});
+}
 
