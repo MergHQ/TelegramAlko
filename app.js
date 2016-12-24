@@ -24,7 +24,7 @@ function postJalluindeksi(msg) {
 }
 
 function postPrice(msg) {
-  let arg = msg.text.split(' ')[3];
+  let arg = msg.text.split(' ').length > 2 ? msg.text.split(' ')[3] : msg.text.split(' ')[1];
   if (arg) {
     needle.get('http://droptable.tk:8080/products', (err, res) => {
       let products = [];
