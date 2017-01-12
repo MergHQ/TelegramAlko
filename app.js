@@ -11,6 +11,7 @@ client.onText(/\/jalluindeksi/, postJalluindeksi);
 client.onText(/\/price/, postPrice);
 
 client.on('message', msg => {
+  if (!msg.text) return;
   if (msg.text.toLowerCase() === 'nykyinen jalluindeksi?')
     postJalluindeksi(msg);
   else if(msg.text.toLowerCase().match(/mikä on tuotteen ([^\s]+) hinta\?/g)) 
