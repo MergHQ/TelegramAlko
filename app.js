@@ -3,14 +3,14 @@
 const needle = require('needle');
 const TelegramClient = require('node-telegram-bot-api');
 const FS = require('fs');
-const config = JSON.parse(FS.readFileSync('conf', 'utf8'));
+const config = require('./config.json');
 
 var client = new TelegramClient(config.alkoBot, { polling: true });
 
 var jallustats = null;
 
 function pollJallu() {
-  needle.get('https://acumj9o7uh.execute-api.eu-central-1.amazonaws.com/dev/getJallu', (err, res) => {
+  needle.get(config.jalluinfoURL, (err, res) => {
     if (!err && res.body.message == 'Success')
       jallustats = res.body;
   });
@@ -21,6 +21,7 @@ setInterval(pollJallu, 3600 * 1000);
 
 client.onText(/\/jalluindeksi/, postJalluindeksi);
 client.onText(/\/price/, postPrice);
+client.onText(/\/jalluinfo/, postJalluinfo);
 
 client.on('message', msg => {
   if (!msg.text) return;
@@ -28,7 +29,20 @@ client.on('message', msg => {
     postJalluindeksi(msg);
   else if (msg.text.toLowerCase().match(/mikä on tuotteen ([^\s]+) hinta\?/g))
     postPrice(msg);
+  else if (msg.text.toLowerCase() === 'mikä on jallu?') {
+    postJalluinfo(msg);
+  }
 });
+
+function postJalluinfo(msg) {
+  if (!jallustats) return;
+  let str = '';
+  str += `***Current price:*** ${jallustats.data.price} €\n`;
+  str += `***Alcohol precentage:*** ${jallustats.data.alcohol}\n`;
+  str += `***Sugar:*** ${jallustats.data.sugar}\n`;
+  str += `***Energy:*** ${jallustats.data.  energy}`;
+  client.sendMessage(msg.chat.id, str, {parse_mode: 'markdown'});
+}
 
 function postJalluindeksi(msg) {
   if (jallustats)
