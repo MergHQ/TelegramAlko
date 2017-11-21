@@ -5,6 +5,10 @@ const TelegramClient = require('node-telegram-bot-api');
 const FS = require('fs');
 const config = require('./config.json');
 
+const AlkoProductService = require('./service/AlkoProductService');
+
+let alkoProductService = new AlkoProductService();
+
 var client = new TelegramClient(config.alkoBot, { polling: true });
 
 var jallustats = null;
@@ -20,8 +24,8 @@ pollJallu();
 setInterval(pollJallu, 3600 * 1000);
 
 client.onText(/\/jalluindeksi/, postJalluindeksi);
-client.onText(/\/price/, postPrice);
-client.onText(/\/jalluinfo/, postJalluinfo);
+client.onText(/\/etsi/, findProdcuts);
+client.onText(/\/hinta/, postPrice);
 
 client.on('message', msg => {
   if (!msg.text) return;
@@ -29,10 +33,25 @@ client.on('message', msg => {
     postJalluindeksi(msg);
   else if (msg.text.toLowerCase().match(/mikä on tuotteen ([^\s]+) hinta\?/g))
     postPrice(msg);
-  else if (msg.text.toLowerCase() === 'mikä on jallu?') {
+  else if (msg.text.toLowerCase() === 'mikä on jallu?')
     postJalluinfo(msg);
-  }
+  else if (msg.text.toLowerCase().includes('info'))
+    postProductInformation(msg);
 });
+
+function findProdcuts(msg) {
+  let arg = msg.text.split(' ').length > 2 ? msg.text.split(' ')[3] : msg.text.split(' ')[1];
+  if (arg) {
+    alkoProductService.searchProduct(arg).then(result => {
+      let str = '';
+      result.forEach(product => {
+        if (product == null) return;
+        str += `${product.name} | tuotteen tunnus: ${product.id}\n`;
+      });
+      client.sendMessage(msg.chat.id, str);
+    }).catch(e => console.error(e))
+  }
+}
 
 function postJalluinfo(msg) {
   if (!jallustats) return;
@@ -40,8 +59,32 @@ function postJalluinfo(msg) {
   str += `***Current price:*** ${jallustats.data.price} €\n`;
   str += `***Alcohol precentage:*** ${jallustats.data.alcohol}\n`;
   str += `***Sugar:*** ${jallustats.data.sugar}\n`;
-  str += `***Energy:*** ${jallustats.data.  energy}`;
-  client.sendMessage(msg.chat.id, str, {parse_mode: 'markdown'});
+  str += `***Energy:*** ${jallustats.data.energy}`;
+  client.sendMessage(msg.chat.id, str, { parse_mode: 'markdown' });
+}
+
+function postProductInformation(msg) {
+  let product = msg.text.substr(0, msg.text.toLowerCase().indexOf('info') + 1);
+  if (product === 'jallu') {
+    postJalluinfo();
+    return;
+  }
+  needle.get('http://droptable.tk:8080/products', (err, res) => {
+    for (let i in res.body.data) {
+      let o = res.body.data[i];
+      try {
+        if (o.name && o.name.toLowerCase().indexOf(product.toLowerCase()) > -1) {
+          let str = '';
+          str += `***Current price:*** ${o.price} €\n`;
+          str += `***Producer:*** ${o.producer} €\n`
+          str += `***Volume:*** ${o.volume}`;
+          client.sendMessage(msg.chat.id, str, { parse_mode: 'markdown' });
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
 }
 
 function postJalluindeksi(msg) {
@@ -52,26 +95,14 @@ function postJalluindeksi(msg) {
 function postPrice(msg) {
   let arg = msg.text.split(' ').length > 2 ? msg.text.split(' ')[3] : msg.text.split(' ')[1];
   if (arg) {
-    needle.get('http://droptable.tk:8080/products', (err, res) => {
-      let products = [];
-      for (let i in res.body.data) {
-        let o = res.body.data[i];
-        try {
-          if (o.name && o.name.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
-            products.push(o);
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-
-      let resStr = '';
-      for (let o of products) {
-        resStr += `${o.name.replace('*', '1t').replace('***', '3t')} | ${o.volume}l  | *${o.price}€*\n`;
-      }
-
-      client.sendMessage(msg.chat.id, resStr, { parse_mode: 'markdown' });
+    alkoProductService.getProductInformation(arg).then(product => {
+      if (!product) return;
+      let str = `***${product.name}***\n`;
+      str += `***Current price:*** ${product.price} €\n`;
+      str += `***Alcohol precentage:*** ${product.alcohol}\n`;
+      str += `***Sugar:*** ${product.sugar}\n`;
+      str += `***Energy:*** ${product.energy}`;
+      client.sendMessage(msg.chat.id, str, { parse_mode: 'markdown' });
     });
   }
 }
-
