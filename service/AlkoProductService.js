@@ -5,20 +5,16 @@ const bluebird = require('bluebird');
 needle.get = bluebird.promisify(needle.get);
 needle.post = bluebird.promisify(needle.post);
 
-const SEARCH_URL = 'https://www.alko.fi/INTERSHOP/web/WFS/Alko-OnlineShop-Site/fi_FI/-/EUR/ViewSuggestSearch-Suggest?OnlyProductSearch=true&SaytContext=SERP&AjaxRequestMarker=true';
+const SEARCH_URL = searchTerm => `https://www.alko.fi/tuotteet?SearchTerm=${searchTerm}`;
 const PRODUCT_URL = productId => `https://www.alko.fi/tuotteet/${productId}/`;
 
 class AlkoProductService {
 
   async searchProduct(searchTerm) {
-    let result = await needle.post(SEARCH_URL, 'SearchTerm=' + searchTerm);
+    let result = await needle.get(SEARCH_URL(searchTerm));
     let body = cheerio.load(result.body);
-    let products = body('.search-tab-item').toArray().map(productElem => {
-      let productElemAttribs = productElem.attribs.href.split('/');
-      if (productElemAttribs.length < 5)
-        return;
-      else
-        return {name: productElem.firstChild.data, id: productElem.attribs.href.split('/')[4]}
+    let products = body('.mini-product-wrap').toArray().map(productElem => {
+      return this.parseElementData(productElem);
     });
     return products;
   }
@@ -44,6 +40,20 @@ class AlkoProductService {
         pricePerLiter
       }
     }
+  }
+
+  parseElementData(elem) {
+    let data = elem.childNodes[1].firstChild.children[1];
+    let id = data.attribs['data-alkoproduct'];
+    let price = data.children[1].children[1].attribs.content
+    let volume = data.children[3].firstChild.data;
+    let name = data.children[6].children[1].children[3].children[1].firstChild.data
+    return {
+      id,
+      name,
+      volume,
+      price
+    };
   }
 
 }
