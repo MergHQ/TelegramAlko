@@ -5,13 +5,20 @@ const bluebird = require('bluebird');
 needle.get = bluebird.promisify(needle.get);
 needle.post = bluebird.promisify(needle.post);
 
-const SEARCH_URL = searchTerm => `https://www.alko.fi/tuotteet?SearchTerm=${searchTerm}`;
+const SEARCH_URL = async searchTerm => {
+  let result = await needle.post('https://www.alko.fi/INTERSHOP/web/WFS/Alko-OnlineShop-Site/fi_FI/-/EUR/ViewSuggestSearch-Suggest?SaytContext=Header&AjaxRequestMarker=true', `SearchTerm=${searchTerm}`);
+  let $ = cheerio.load(result.body);
+  if (!$('.search-tab-item').length) return '';
+  let fc = $('.search-tab-item')[0].firstChild.data;
+  let productCount = Number(fc.split('(')[1].split(')')[0].replace(' ', '')); // lol wtf is this
+  return `https://www.alko.fi/tuotteet/tuotelistaus?SearchTerm=${searchTerm}&PageSize=12&PageNumber=${Math.floor(productCount / 12)}`;
+}
 const PRODUCT_URL = productId => `https://www.alko.fi/tuotteet/${productId}/`;
 
 class AlkoProductService {
 
   async searchProduct(searchTerm) {
-    let result = await needle.get(SEARCH_URL(searchTerm));
+    let result = await needle.get(await SEARCH_URL(searchTerm));
     let body = cheerio.load(result.body);
     let products = body('.mini-product-wrap').toArray().map(productElem => {
       return this.parseElementData(productElem);
