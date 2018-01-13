@@ -47,9 +47,11 @@ function findProducts(msg) {
       let str = '';
       result.forEach(product => {
         if (product == null) return;
-        str += `${product.name} ${product.volume} ${product.price}€ | tuotteen tunnus: ${product.id}\n`;
+        str += `***${product.name}*** ${product.volume} ${product.price}€ | tuotteen tunnus: ${product.id}\n`;
       });
-      client.sendMessage(msg.chat.id, str);
+      client.sendMessage(msg.chat.id, str, {
+        parse_mode: 'markdown'
+      });
     }).catch(e => console.error(e))
   }
 }
