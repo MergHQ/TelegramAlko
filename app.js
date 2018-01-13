@@ -24,7 +24,7 @@ pollJallu();
 setInterval(pollJallu, 3600 * 1000);
 
 client.onText(/\/jalluindeksi/, postJalluindeksi);
-client.onText(/\/etsi/, findProdcuts);
+client.onText(/\/etsi/, findProducts);
 client.onText(/\/hinta/, postPrice);
 
 client.on('message', msg => {
@@ -39,8 +39,9 @@ client.on('message', msg => {
     postProductInformation(msg);
 });
 
-function findProdcuts(msg) {
-  let arg = msg.text.split(' ').length > 2 ? msg.text.split(' ')[3] : msg.text.split(' ')[1];
+function findProducts(msg) {
+  let splitMessage = msg.text.split(' ');
+  let arg = splitMessage.length > 2 ? (() => { splitMessage.shift(); return splitMessage.join(' ')})() : msg.text.split(' ')[1];
   if (arg) {
     alkoProductService.searchProduct(arg).then(result => {
       let str = '';
