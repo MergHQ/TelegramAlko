@@ -9,7 +9,7 @@ deploy:
   secret_access_key: "$AWS_KEY_SECRET"
   region: "eu-central-1"  
   app: "telegram-alko"
-  env: "telegram-alko-prod"
+  env: "TelegramAlko-env"
   bucket_name: "telegram-alko-bucket"
   on:
     branch: master

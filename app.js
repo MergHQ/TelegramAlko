@@ -1,20 +1,19 @@
 'use strict';
-
+require('dotenv').config();
 const needle = require('needle');
 const TelegramClient = require('node-telegram-bot-api');
 const FS = require('fs');
-const config = require('./config.json');
 
 const AlkoProductService = require('./service/AlkoProductService');
 
 let alkoProductService = new AlkoProductService();
 
-var client = new TelegramClient(config.alkoBot, { polling: true });
+var client = new TelegramClient(process.env.ALKO_BOT_TOKEN, { polling: true });
 
 var jallustats = null;
 
 function pollJallu() {
-  needle.get(config.jalluinfoURL, (err, res) => {
+  needle.get(process.env.JALLU_INFO_URL, (err, res) => {
     if (!err && res.body.message == 'Success')
       jallustats = res.body;
   });
