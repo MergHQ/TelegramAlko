@@ -47,7 +47,7 @@ function findProducts(msg) {
       let str = '';
       result.forEach(product => {
         if (product == null) return;
-        str += `***${product.name}*** ${product.volume} ${product.price}€ | tuotteen tunnus: ${product.id}\n`;
+        str += `***${product.name.replace(/\*/g, '⭐')}*** ${product.volume} ${product.price}€ | tuotteen tunnus: ${product.id}\n`;
       });
       client.sendMessage(msg.chat.id, str, {
         parse_mode: 'markdown'
@@ -100,7 +100,7 @@ function postPrice(msg) {
   if (arg) {
     alkoProductService.getProductInformation(arg).then(product => {
       if (!product) return;
-      let str = `***${product.name}***\n`;
+    let str = `***${product.name.replace(/\*/g, '⭐')}***\n`;
       str += `***Current price:*** ${product.price} €\n`;
       str += `***Alcohol precentage:*** ${product.alcohol}\n`;
       str += `***Sugar:*** ${product.sugar}\n`;
