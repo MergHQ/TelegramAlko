@@ -10,5 +10,8 @@
         "dotenv": "^6.0.0",
         "needle": "*",
         "node-telegram-bot-api": "*"
+    },
+    "scripts": {
+        "start": "node app.js"
     }
 }

@@ -24,7 +24,7 @@ setInterval(pollJallu, 3600 * 1000);
 
 client.onText(/\/jalluindeksi/, postJalluindeksi);
 client.onText(/\/etsi/, findProducts);
-client.onText(/\/hinta/, postPrice);
+client.onText(/\/tiedot/, postPrice);
 
 client.on('message', msg => {
   if (!msg.text) return;
