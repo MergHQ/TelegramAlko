@@ -20,7 +20,7 @@ class AlkoProductService {
   async searchProduct(searchTerm) {
     let result = await needle.get(await SEARCH_URL(searchTerm));
     let body = cheerio.load(result.body);
-    let products = body('.mini-product-wrap').toArray().map(productElem => {
+    let products = body('.mini-card-wrap').toArray().map(productElem => {
       return this.parseElementData(productElem);
     });
     return products;
@@ -52,9 +52,9 @@ class AlkoProductService {
   parseElementData(elem) {
     let data = elem.childNodes[1].firstChild.children[1];
     let id = data.attribs['data-alkoproduct'];
-    let price = data.children[3].children[1].attribs.content
-    let volume = data.children[5].firstChild.attribs['aria-label'];
-    let name = data.children[8].children[1].children[3].children[1].firstChild.data;
+    let price = data.children[13].attribs['content']
+    let volume = data.childNodes[18].attribs['aria-label']
+    let name = data.childNodes[11].firstChild.data;
     return {
       id,
       name,
