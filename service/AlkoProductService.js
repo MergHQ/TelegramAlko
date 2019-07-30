@@ -50,11 +50,11 @@ class AlkoProductService {
   }
 
   parseElementData(elem) {
-    let data = elem.childNodes[1].firstChild.children[1];
+    let data = elem.childNodes[5].firstChild.children[1];
     let id = data.attribs['data-alkoproduct'];
-    let price = data.children[15].attribs['content']
-    let volume = data.childNodes[20].attribs['aria-label']
-    let name = data.childNodes[13].firstChild.data;
+    let price = data.children[28].attribs['content']
+    let volume = data.childNodes[34].attribs['aria-label']
+    let name = data.childNodes[17].firstChild.data;
     return {
       id,
       name,
