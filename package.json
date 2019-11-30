@@ -5,13 +5,23 @@
     "version": "1.0.0",
     "main": "pathToMain",
     "dependencies": {
+        "@types/baconjs": "^3.0.0",
+        "@types/cheerio": "^0.22.14",
+        "@types/node": "^12.12.12",
+        "@types/node-telegram-bot-api": "^0.40.0",
+        "@types/ramda": "^0.26.36",
+        "axios": "^0.19.0",
+        "baconjs": "^3.0.11",
         "bluebird": "^3.5.1",
         "cheerio": "^1.0.0-rc.2",
         "dotenv": "^6.0.0",
         "needle": "*",
-        "node-telegram-bot-api": "*"
+        "node-telegram-bot-api": "*",
+        "ramda": "^0.26.1",
+        "ts-node": "^8.5.2",
+        "typescript": "^3.7.2"
     },
     "scripts": {
-        "start": "node app.js"
+        "start": "ts-node ./src/app.ts"
     }
 }
