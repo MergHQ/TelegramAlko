@@ -3,6 +3,7 @@ import { fromAction, sendAction } from '../actionDispatfcher'
 import * as TelegramClient from 'node-telegram-bot-api'
 import { searchProduct } from '../services/alkoProductService'
 import searchResponseTemplate from '../templates/searchResponseTemplate'
+import * as Sentry from '@sentry/node'
 
 const parseArgs = (message: string) => {
   const splitted = message.split(' ')
@@ -16,7 +17,13 @@ export function searchStore() {
     .map(e => ({
       chatId: e.chat.id,
       data: parseArgs(e.text)}))
-    .flatMapLatest(e => Bacon.fromPromise(searchProducts(e.data).then(data => ({ chatId: e.chatId, data }))))
+    .flatMapLatest(e =>
+      Bacon.fromPromise(searchProducts(e.data)
+        .then(data => ({ chatId: e.chatId, data }))))
+    .flatMapError(error => {
+      Sentry.captureException(error)
+      return ''
+    })
     .onValue(data => sendAction({id: 'SEND_MESSAGE', data}))
 }
 

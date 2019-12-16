@@ -54,7 +54,7 @@ export async function getProductInformation(productId) {
 
 function parseElementData(elem: CheerioElement) {
   const productData = JSON.parse(elem.attribs['data-product-data'])
-  const price = elem.children.filter(e => e.type !== 'comment')[18].attribs['content']
+  const price = elem.children.filter(e => e.type !== 'comment')[19].attribs['content']
   return {
     id: productData.id,
     name: productData.name,

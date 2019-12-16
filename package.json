@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "main": "pathToMain",
     "dependencies": {
+        "@sentry/node": "5.10.2",
         "@types/baconjs": "^3.0.0",
         "@types/cheerio": "^0.22.14",
         "@types/node": "^12.12.12",
