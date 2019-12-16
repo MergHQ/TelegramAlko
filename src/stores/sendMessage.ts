@@ -1,5 +1,5 @@
 import * as Bacon from 'baconjs'
-import { fromAction } from '../actionDispatfcher'
+import { fromAction } from '../actionDispatcher'
 import { CommandResponse } from '../types'
 
 export function sendMessageStore() {

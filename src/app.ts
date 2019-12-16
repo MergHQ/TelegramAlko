@@ -1,6 +1,6 @@
 require('dotenv').config()
 import * as TelegramClient from 'node-telegram-bot-api'
-import { sendAction } from './actionDispatfcher'
+import { sendAction } from './actionDispatcher'
 import { searchStore } from './stores/searchStore'
 import { sendMessageStore } from './stores/sendMessage'
 import * as Sentry from '@sentry/node'
@@ -12,4 +12,6 @@ client.on('message', msg => sendAction({ id: 'NEW_MESSAGE', data: msg }));
 
 searchStore()
 const sendMessageP = sendMessageStore()
-sendMessageP.onValue(value => value.data.length > 0 && client.sendMessage(value.chatId, value.data, { parse_mode: "Markdown" }))
+sendMessageP
+  .onValue(value =>
+    value.data.length > 0 && client.sendMessage(value.chatId, value.data, { parse_mode: "Markdown" }))

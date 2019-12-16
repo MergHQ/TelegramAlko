@@ -1,5 +1,5 @@
 import * as Bacon from 'baconjs'
-import { fromAction, sendAction } from '../actionDispatfcher'
+import { fromAction, sendAction } from '../actionDispatcher'
 import * as TelegramClient from 'node-telegram-bot-api'
 import { searchProduct } from '../services/alkoProductService'
 import searchResponseTemplate from '../templates/searchResponseTemplate'
@@ -22,7 +22,9 @@ export function searchStore() {
         .then(data => ({ chatId: e.chatId, data }))))
     .flatMapError(error => {
       Sentry.captureException(error)
-      return ''
+      return {
+        data: ''
+      }
     })
     .onValue(data => sendAction({id: 'SEND_MESSAGE', data}))
 }
