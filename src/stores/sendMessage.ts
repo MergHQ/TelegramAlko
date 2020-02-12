@@ -1,10 +1,10 @@
 import * as Bacon from 'baconjs'
 import { fromAction } from '../actionDispatcher'
-import { CommandResponse } from '../types'
+import { SendMessageAction } from '../types'
 
 export function sendMessageStore() {
   const sendMessageS = fromAction('SEND_MESSAGE')
-  return Bacon.update<CommandResponse>({chatId: '', data: ''},
+  return Bacon.update<SendMessageAction>({type: 'message', chatId: '', data: ''},
     [sendMessageS, (iv, nv) => nv]
   )
 }
