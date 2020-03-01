@@ -22,11 +22,11 @@ export function searchStore() {
         .then(data => ({ chatId: e.chatId, data }))))
     .flatMapError(error => {
       Sentry.captureException(error)
+      return {
+        data: ''
+      }
     })
-    .onValue(data => sendAction({id: 'SEND_MESSAGE', data: {
-      type: 'message',
-      ...data
-    }}))
+    .onValue(data => sendAction({id: 'SEND_MESSAGE', data}))
 }
 
 function searchProducts(searchTerm: string) {

@@ -1,3 +1,5 @@
+language: nodejs
+
 
 script: echo "Not implemented"
 
