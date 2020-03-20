@@ -1,15 +1,14 @@
-language: nodejs
+language: python
 
+services:
+  - docker
 
 script: echo "Not implemented"
 
-deploy:
-  provider: elasticbeanstalk
-  access_key_id: $AWS_KEY_ID
-  secret_access_key: "$AWS_KEY_SECRET"
-  region: "eu-central-1"  
-  app: "telegram-alko"
-  env: "TelegramAlko-env"
-  bucket_name: "telegram-alko-bucket"
-  on:
-    branch: master
+after_success:
+  - pip install awscli
+  - export PATH=$PATH:$HOME/.local/bin
+  - eval $(aws ecr get-login --region eu-central-1 --no-include-email)
+  - docker build . -t tg-alko
+  - docker tag tg-alko:latest $AWS_ECR_URL:latest
+  - docker push $AWS_ECR_URL:latest
