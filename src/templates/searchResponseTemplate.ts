@@ -1,4 +1,6 @@
-export default function(items: any[]) {
+import { SearchResult } from '../services/alkoProductService'
+
+export default function(items: SearchResult[]) {
   return items
     .map(item =>
       item
