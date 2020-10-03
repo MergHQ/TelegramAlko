@@ -1,0 +1,30 @@
+name: Telegram Alko pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Build, tag, and push image to DO CR
+      if: contains(github.ref, 'refs/heads/master') || contains(github.ref, 'refs/tags/deploy-staging')
+      env:
+        REGISTRY: ${{ secrets.REGISTRY }}
+        REPOSITORY: telegram-alko
+        IMAGE_TAG: latest
+      run: |
+        doctl registry login
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
