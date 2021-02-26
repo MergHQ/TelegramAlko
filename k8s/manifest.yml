@@ -1,21 +1,21 @@
 ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    name: telegram-alko
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegram-alko
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegram-alko
+  template:
+    metadata:
+      labels:
         app: telegram-alko
-    template:
-      metadata:
-        labels:
-          app: telegram-alko
-      spec:
-        containers:
+    spec:
+      containers:
         - name: telegram-alko
-          image: registry.digitalocean.com/merg-registry/telegram-alko:latest
+          image: hugis420/telegram-alko:latest
           env:
             - name: ALKO_BOT_TOKEN
               valueFrom:
